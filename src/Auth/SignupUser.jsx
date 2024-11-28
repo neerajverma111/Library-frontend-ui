@@ -11,6 +11,7 @@ const Signup = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState();
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
   const passRegex =
     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -96,6 +97,9 @@ const Signup = () => {
             value={userEmail}
             onChange={(e) => setUserEmail(e.target.value)}
             placeholder="Enter your email"
+            onInput={(e) => {
+              e.target.value = e.target.value.toLowerCase();
+            }}
           />
 
           <InputField

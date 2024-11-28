@@ -6,6 +6,7 @@ const InputField = ({
   value,
   onChange,
   placeholder,
+  onInput
 }) => {
   return (
     <div className="mb-4">
@@ -19,6 +20,7 @@ const InputField = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
+        onInput={onInput}
         required
         className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />

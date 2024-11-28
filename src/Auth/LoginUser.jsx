@@ -7,7 +7,9 @@ import Button from "../constants/Button";
 const LoginUser = () => {
   const { userDetails, setUserDetails, loginUser } =
     useContext(LoginUserContext);
+  
   const navigate = useNavigate();
+  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUserDetails((prev) => ({ ...prev, [name]: value }));
@@ -19,11 +21,7 @@ const LoginUser = () => {
     const result = await loginUser();
     if (result.success === true) {
       toast.success(result.message);
-      if (result.isAdmin) { 
-        navigate("/admin-dashboard");
-      } else {
-        navigate("/user-dashboard");
-      }
+      navigate("/user-dashboard");
     } else {
       toast.error(result.message);
       navigate("/not-authorized");
@@ -47,6 +45,9 @@ const LoginUser = () => {
             value={userDetails.email}
             onChange={handleInputChange}
             placeholder="Enter your Email"
+            onInput={(e) => {
+              e.target.value = e.target.value.toLowerCase();
+            }}
           />
 
           <InputField
@@ -58,7 +59,11 @@ const LoginUser = () => {
             onChange={handleInputChange}
             placeholder="Enter your Password"
           />
-          <Button type="submit" onClick={handleSubmit}>
+          <Button
+            type="submit"
+            onClick={handleSubmit}
+            className={`w-full py-3 mt-4 bg-blue-500 text-white font-bold rounded-md hover:bg-blue-600 focus:outline-none`}
+          >
             Log In
           </Button>
           <div className="mt-2 text-center">

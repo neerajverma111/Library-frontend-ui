@@ -7,12 +7,14 @@ import App from "./App";
 import { UserProvider } from "./context/UserContext";
 import { BookProvider } from "./context/BookContext";
 import { LoginUserProvider } from "./context/LoginUser";
+import { IssueBookProvider } from "./context/IssueContext";
 
 // import BookList from "./components/BookList";
 // import { UserAuthProvider } from "./context/LoginSignupContext";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  <>
+    {/* <StrictMode> */}
     <ToastContainer
       position="top-right"
       autoClose={3000}
@@ -29,9 +31,12 @@ createRoot(document.getElementById("root")).render(
     <UserProvider>
       <BookProvider>
         <LoginUserProvider>
-          <App />
+          <IssueBookProvider>
+            <App />
+          </IssueBookProvider>
         </LoginUserProvider>
       </BookProvider>
     </UserProvider>
-  </StrictMode>
+    {/* </StrictMode> */}
+  </>
 );

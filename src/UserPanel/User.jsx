@@ -1,21 +1,21 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
-// import { decodeToken } from "../constants/Jwt-Decode";
+// import { userName } from "../constants/Jwt-Decode";
+import { decodeToken } from "../constants/Jwt-Decode";
+import { IssueContext } from "../context/IssueContext";
 const User = () => {
   const navigate = useNavigate();
 
-  // const jwtToken = localStorage.getItem("token");
-  // const fetchUser = decodeToken(jwtToken);
-  // const email = fetchUser.data.email;
-  // const userName = email.split("@")[0];
+  const jwt_token = localStorage.getItem("token");
+  const userName = decodeToken(jwt_token).data.username;
 
   const handleLogout = () => {
     toast.success("User logged out !!");
-    localStorage.clear(); // Clear localStorage
+
     setTimeout(() => {
+      localStorage.clear(); // Clear localStorage
       navigate("/");
     }, 1000);
   };
@@ -46,7 +46,7 @@ const User = () => {
       </button>
       <aside
         id="default-sidebar"
-        class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+        class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 overflow-hidden"
         aria-label="Sidebar"
       >
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
@@ -70,7 +70,7 @@ const User = () => {
                     ></path>
                   </svg>
                 </div>
-                <span class="ms-3 font-bold mt-2 ml-2">User</span>
+                <span class="ms-3 font-bold  ml-2">{`Hello ` + userName}</span>
               </Link>
             </li>
             <li>
@@ -79,28 +79,14 @@ const User = () => {
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <img src="/icons8-book-100.png" alt="" className="h-7 w-7 " />
-                <span class="flex-1 ms-3 whitespace-nowrap">Issue Book</span>
+                <span class="flex-1 ms-3 whitespace-nowrap">Issue Books</span>
               </Link>
             </li>
-
-            <li>
-              <Link
-                to={"/return-book"}
-                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <img
-                  src="/icons8-return-book-100.png"
-                  alt=""
-                  className="h-7 w-7 "
-                />
-                <span class="flex-1 ms-3 whitespace-nowrap">Return Book</span>
-              </Link>
-            </li>
-
             <li>
               <Link
                 to={"/pay-fine"}
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                
               >
                 <img src="/image.png" alt="" className="h-7 w-7 " />
                 <span class="flex-1 ms-3 whitespace-nowrap">Pay Fine</span>
@@ -108,7 +94,7 @@ const User = () => {
             </li>
             <li>
               <Link
-                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group mt-[67vh]"
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group mt-[63vh]"
                 onClick={handleLogout}
               >
                 <img src="/7124045_logout_icon.png" className="h-7 w-7 " />
