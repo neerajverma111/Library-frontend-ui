@@ -12,8 +12,10 @@ export const UserProvider = ({ children }) => {
   const [itemsPerPage] = useState(8);
   const [totalPages, setTotalPages] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const allUsers = async (page = 1) => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         `http://${apiUrl}/users/admin/get-all-users?page=${page}&limit=${itemsPerPage}`,
@@ -28,12 +30,15 @@ export const UserProvider = ({ children }) => {
     } catch (error) {
       console.error("Error fetching users:", error.message);
       toast.error("Failed to fetch users.");
+    } finally{
+      setIsLoading(false);
     }
   };
 
   return (
     <UserContext.Provider
       value={{
+        isLoading,
         totalUsers,
         allUsers,
         setShowUsers,

@@ -6,7 +6,7 @@ import ReactPaginate from "react-paginate";
 import { UserContext } from "../context/UserContext";
 
 const WhitelistUsers = () => {
-  const { showUsers, currentPage, totalPages, setCurrentPage, allUsers } =
+  const {isLoading, showUsers, currentPage, totalPages, setCurrentPage, allUsers } =
     useContext(UserContext);
 
   const updateUser = async (userId, isChecked) => {
@@ -45,6 +45,9 @@ const WhitelistUsers = () => {
     }
   }, [showUsers]);
   return (
+    <>
+  {isLoading ? <h2 className="text-xl font-bold text-center">Loading...</h2> : 
+  
     <div className="overflow-x-auto bg-gray-800 p-6 rounded-lg shadow-lg">
       {showUsers.length > 0 ? (
         <>
@@ -137,6 +140,8 @@ const WhitelistUsers = () => {
         <p className="text-white text-center">No users available.</p>
       )}
     </div>
+    }
+    </>
   );
 };
 
