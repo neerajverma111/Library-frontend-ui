@@ -1,10 +1,33 @@
-import React, { useContext } from "react";
-import { BookContext } from "../context/BookContext";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
+import axios from "axios";
+import { apiUrl, jwtToken, token } from "../constants/Constant";
 const AllThingsHere = () => {
-  const { totalBooks } = useContext(BookContext);
-  const { totalUsers } = useContext(UserContext);
+  const [count, setCount] = useState({
+    booksCount: "",
+    usersCount: "",
+  });
+  const getCount = async () => {
+    try {
+      const response = await axios.get(
+        `http://${apiUrl}/users/admin/count-book-user`,
+        jwtToken
+      );
+      if (response.status === 200) {
+        setCount({
+          booksCount: response.data.books,
+          usersCount: response.data.users,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error.message);
+      toast.error("Failed to fetch users.");
+    }
+  };
+
+  useEffect(() => {
+    getCount();
+  }, []);
 
   return (
     <div className="p-6">
@@ -15,7 +38,7 @@ const AllThingsHere = () => {
               Total Books
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              {totalBooks ? totalBooks?.totalbooks : 0} Books
+              {count.booksCount ? count?.booksCount : 0} Books
             </p>
           </div>
         </Link>
@@ -26,7 +49,7 @@ const AllThingsHere = () => {
               Users
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              {totalUsers ? totalUsers : 0} Users
+              {count.usersCount ? count?.usersCount : 0} Users
             </p>
           </div>
         </Link>

@@ -1,24 +1,24 @@
 import axios from "axios";
 import React, {
+  memo,
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
-import { apiUrl } from "../constants/Constant";
+import { apiUrl, jwtToken } from "../constants/Constant";
 import { BookContext } from "../context/BookContext";
+import { Link } from "react-router-dom";
+import * as yup from "yup";
 
-const BookList = () => {
+const BookList = memo(() => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [book, setBook] = useState(null);
-  const [errorMessage, setErrorMessage] = useState();
-  const [checkValue, setCheckValue] = useState(false);
-  const bookNameRegex = /^[a-zA-Z\s]+$/;
+  const [yupErrors, setYupErrors] = useState({});
 
   const [bookData, setBookData] = useState({
     newBookName: "",
@@ -42,22 +42,47 @@ const BookList = () => {
       [field]: value,
     }));
   };
-  const errorMessageRef = useRef("");
 
-  // Update error message
   const handleInputChange = (e) => {
-    const value = e.target.value;
+    const { name, value } = e.target;
+    handleChange(name, value); // Update state dynamically
 
-    if (bookNameRegex.test(value) || value === "") {
-      setSelectedBook(value);
-      errorMessageRef.current = "";
-      setCheckValue(true);
-      handleChange("newBookName", value);
-    } else {
-      errorMessageRef.current =
-        "Book name can only contain letters and spaces.";
-    }
+    // Validate the specific field
+    yup
+      .reach(schema, name)
+      .validate(value)
+      .then(() => {
+        setYupErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          delete newErrors[name];
+          return newErrors;
+        });
+      })
+      .catch((err) => {
+        setYupErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: err.message,
+        }));
+      });
   };
+
+  const schema = yup.object().shape({
+    newBookName: yup
+      .string()
+      .required("Book Name is required")
+      .matches(
+        /^[a-zA-Z\s]+$/,
+        "Book Name can only contain letters and spaces."
+      ),
+    newDepartment: yup.string().required("Department is required"),
+    newQuantity: yup
+      .number()
+      .typeError("Quantity must be a number")
+      .positive("Quantity must be greater than 0")
+      .integer("Quantity must be an integer")
+      .required("Quantity is required"),
+  });
+
   const updateBook = async () => {
     setIsLoading(true);
     console.log(bookData.newDepartment);
@@ -69,12 +94,12 @@ const BookList = () => {
           name: bookData.newBookName,
           department: bookData.newDepartment,
           quantity: bookData.newQuantity,
-        }
+        },
+        jwtToken
       );
       if (response.status === 201) {
         toast.success(response.data.name);
         getBooks();
-        setCheckValue(false);
       }
     } catch (error) {
       console.log("Error in Book List", error.message);
@@ -86,10 +111,20 @@ const BookList = () => {
   const isClickedRef = useRef(false);
 
   const handleSave = async () => {
-    if (isClickedRef.current && checkValue) {
-      await updateBook();
-      handleCloseModal();
-    }
+    schema
+      .validate(bookData, { abortEarly: false })
+      .then(() => {
+        setYupErrors({}); // Clear all errors on successful validation
+        updateBook();
+        handleCloseModal();
+      })
+      .catch((err) => {
+        const errors = {};
+        err.inner.forEach((error) => {
+          errors[error.path] = error.message;
+        });
+        setYupErrors(errors); // Set all errors
+      });
   };
 
   const handleEditClick = useCallback((book) => {
@@ -101,7 +136,7 @@ const BookList = () => {
     });
     isClickedRef.current = true;
     setIsModalOpen(true);
-  },[]);
+  }, []);
 
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
@@ -112,24 +147,26 @@ const BookList = () => {
     const newPage = event.selected + 1; // Convert 0-indexed to 1-indexed
     setCurrentPage(newPage);
     getBooks(newPage);
-  },[]);
-
-  useEffect(() => {
-    getBooks(currentPage);
   }, []);
 
-  // useEffect(() => {
-  //   if (data.length === 0) {
-  //     getBooks();
-  //   }
-  // }, [data]);
-
+  useEffect(() => {
+    if (data.length === 0) {
+      getBooks(currentPage);
+    }
+  }, [data]);
   return (
     <>
       {!isLoading ? (
         <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
           <div className="w-full ">
-            <h2 className="text-3xl font-bold mb-4">Book List</h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-3xl font-bold">Book List</h2>
+              <Link to={"/add-book"}>
+                <button className="text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+                  Add Book
+                </button>
+              </Link>
+            </div>
             {data.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm border border-gray-200 bg-white rounded-lg shadow-md">
@@ -220,7 +257,7 @@ const BookList = () => {
                   }
                   nextLabel={
                     <button
-                      disabled={currentPage === totalPages} // Disable button on the last page
+                      disabled={currentPage === totalPages} // Disable 00button on the last page
                       className={`px-4 py-2 text-sm font-medium text-white ${
                         currentPage === totalPages
                           ? "bg-gray-300 cursor-not-allowed"
@@ -236,8 +273,8 @@ const BookList = () => {
                     </span>
                   }
                   pageCount={totalPages} // Total pages calculation
-                  marginPagesDisplayed={2}
-                  pageRangeDisplayed={3}
+                  marginPagesDisplayed={1}
+                  pageRangeDisplayed={1}
                   onPageChange={handlePageClick} // Handle direct page clicks
                   containerClassName={"flex justify-center mt-6 space-x-2"}
                   pageClassName={
@@ -259,6 +296,7 @@ const BookList = () => {
                 <h3 className="text-lg font-semibold mb-4">Edit Book</h3>
                 <label className="block mb-2 text-sm">Book Name</label>
                 <input
+                  name="newBookName"
                   type="text"
                   className="w-full mb-4 p-2 border rounded"
                   defaultValue={selectedBook?.name}
@@ -266,14 +304,22 @@ const BookList = () => {
                     handleInputChange(e);
                     // handleChange("newBookName", value);
                   }}
+                  maxLength={30}
                   onInput={(e) => {
                     let value = e.target.value;
                     value = value.replace(/\s+/g, " ").trim();
                     handleChange("newBookName", value);
                   }}
                 />
+                {yupErrors.newBookName && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {yupErrors.newBookName}
+                  </p>
+                )}
+
                 <label className="block mb-2 text-sm">Department</label>
                 <select
+                  name="newDepartment"
                   className="w-full mb-4 p-2 border rounded"
                   value={bookData.newDepartment} // Controlled select
                   onChange={(e) => {
@@ -289,9 +335,14 @@ const BookList = () => {
                   <option value="Game">Game</option>
                   <option value="History">History</option>
                 </select>
-
+                {yupErrors.newDepartment && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {yupErrors.newDepartment}
+                  </p>
+                )}
                 <label className="block mb-2 text-sm">Quantity</label>
                 <input
+                  name="newQuantity"
                   type="number"
                   className="w-full mb-4 p-2 border rounded"
                   defaultValue={selectedBook?.quantity}
@@ -305,14 +356,13 @@ const BookList = () => {
                     e.target.value = e.target.value.replace(/[eE+\-]/g, "");
                     if (e.target.value < 0 || e.target.value > 20) {
                       e.target.value = 0;
-                      setErrorMessage(
-                        "Minimum value cannot be less than 0 and max value cannot be more than 20"
-                      );
                     }
                   }}
                 />
-                {errorMessage && (
-                  <p className="text-red-500 text-sm">{errorMessage}</p>
+                {yupErrors.newQuantity && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {yupErrors.newQuantity}
+                  </p>
                 )}
                 <div className="flex justify-end gap-2">
                   <button
@@ -337,6 +387,6 @@ const BookList = () => {
       )}
     </>
   );
-};
+});
 
 export default BookList;

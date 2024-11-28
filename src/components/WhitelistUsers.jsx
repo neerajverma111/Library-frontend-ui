@@ -1,19 +1,20 @@
 import axios from "axios";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { apiUrl } from "../constants/Constant";
+import { apiUrl, jwtToken } from "../constants/Constant";
 import ReactPaginate from "react-paginate";
 import { UserContext } from "../context/UserContext";
 
 const WhitelistUsers = () => {
   const { showUsers, currentPage, totalPages, setCurrentPage, allUsers } =
     useContext(UserContext);
-  
+
   const updateUser = async (userId, isChecked) => {
     try {
       const response = await axios.put(
         `http://${apiUrl}/users/admin/whitelist`,
-        { UserId: userId, isWhitelisted: isChecked }
+        { UserId: userId, isWhitelisted: isChecked },
+        jwtToken
       );
       if (response.status) {
         toast.success(response.data.message);
@@ -22,25 +23,25 @@ const WhitelistUsers = () => {
     } catch (error) {}
   };
 
+  const handlePageClick = useCallback(
+    (event) => {
+      const newPage = event.selected + 1;
+      setCurrentPage(newPage);
+      allUsers(newPage);
+    },
+    [setCurrentPage, allUsers]
+  );
 
-  const handlePageClick = useCallback((event) => {
-    const newPage = event.selected + 1;
-    setCurrentPage(newPage);
-    allUsers(newPage);
-  },[setCurrentPage, allUsers]);
-
-
-  const handleCheck = useCallback((userId, isChecked) => {
-    updateUser(userId, isChecked);
-  },[updateUser])
-
-  useEffect(() => {
-    allUsers(currentPage);
-  }, []);
+  const handleCheck = useCallback(
+    (userId, isChecked) => {
+      updateUser(userId, isChecked);
+    },
+    [updateUser]
+  );
 
   useEffect(() => {
     if (showUsers.length === 0) {
-      allUsers(); // Fetch users once when the component mounts
+      allUsers(currentPage); // Fetch users once when the component mounts
     }
   }, [showUsers]);
   return (

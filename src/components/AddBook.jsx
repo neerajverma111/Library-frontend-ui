@@ -1,8 +1,9 @@
 import React, { useReducer, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { apiUrl } from "../constants/Constant";
-
+import { apiUrl, jwtToken } from "../constants/Constant";
+import { useNavigate } from "react-router-dom";
+import * as yup from "yup";
 // Reducer function to handle updates to the state
 const bookDataReducer = (state, action) => {
   switch (action.type) {
@@ -14,7 +15,7 @@ const bookDataReducer = (state, action) => {
       return state;
   }
 };
-
+//add book function
 const AddBook = () => {
   const [bookData, dispatch] = useReducer(bookDataReducer, {
     bookName: "",
@@ -22,6 +23,8 @@ const AddBook = () => {
     quantity: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [yupErrors, setYupErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,27 +33,39 @@ const AddBook = () => {
       field: name,
       value: value,
     });
+    setYupErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
   };
+
+  const schema = yup.object().shape({
+    bookName: yup.string().required("Book Name is required"),
+    department: yup.string().required("Department is required"),
+    quantity: yup
+      .number()
+      .typeError("Quantity must be a number")
+      .positive("Quantity must be greater than 0")
+      .integer("Quantity must be an integer")
+      .required("Quantity is required"),
+  });
 
   const handleClick = () => {
-    if (bookData.bookName === "") {
-      toast.error("Book Name is required.");
-      return;
-    }
-
-    if (bookData.quantity === "") {
-      toast.error("Quantity is required.");
-      return;
-    }
-
-    if (bookData.department === "") {
-      toast.error("Department is required.");
-      return;
-    }
-
-    addBook();
+    schema
+      .validate(bookData, { abortEarly: false })
+      .then(() => {
+        setYupErrors({});
+        addBook();
+        navigate("/book-list");
+      })
+      .catch((err) => {
+        const errors = {};
+        err.inner.forEach((error) => {
+          errors[error.path] = error.message;
+        });
+        setYupErrors(errors);
+      });
   };
-
   const addBook = async () => {
     setIsLoading(true); // Start loading
     try {
@@ -60,7 +75,8 @@ const AddBook = () => {
           name: bookData.bookName,
           department: bookData.department,
           quantity: bookData.quantity,
-        }
+        },
+        jwtToken
       );
       if (response.status === 201) {
         toast.success("Book Added Successfully");
@@ -95,7 +111,15 @@ const AddBook = () => {
               placeholder="Harry Potter..."
               className="mt-1 block w-full p-2 border rounded-lg text-gray-700 focus:ring-blue-500 focus:border-blue-500"
               disabled={isLoading}
+              maxLength={30} // This enforces the 30-character limit
+              onInput={(e) => {
+                let value = e.target.value;
+                value = value.replace(/\s+/g, " ").trim(); // Optional: Normalize spaces
+              }}
             />
+            {yupErrors.bookName && (
+              <p className="text-red-500 text-sm mt-1">{yupErrors.bookName}</p>
+            )}
           </div>
           <div className="mb-4">
             <label htmlFor="quantity" className="block text-sm font-medium">
@@ -106,8 +130,12 @@ const AddBook = () => {
               name="quantity"
               value={bookData.quantity}
               onChange={handleInputChange}
+              max={"20"}
               onInput={(e) => {
                 e.target.value = e.target.value.replace(/[eE+\-]/g, "");
+                if (e.target.value > 20 || e.target.value < 0) {
+                  e.target.value = 0;
+                }
                 dispatch({
                   type: "SET_BOOK_DATA",
                   field: "quantity",
@@ -119,22 +147,38 @@ const AddBook = () => {
               className="mt-1 block w-full p-2 border rounded-lg text-gray-700 focus:ring-blue-500 focus:border-blue-500"
               disabled={isLoading}
             />
+            {yupErrors.quantity && (
+              <p className="text-red-500 text-sm mt-1">{yupErrors.quantity}</p>
+            )}
           </div>
           <div className="mb-4">
             <label htmlFor="department" className="block text-sm font-medium">
               Department:
             </label>
-            <input
+            <select
               id="department"
               name="department"
               value={bookData.department}
               onChange={handleInputChange}
-              type="text"
-              placeholder="e.g. - Fiction"
               className="mt-1 block w-full p-2 border rounded-lg text-gray-700 focus:ring-blue-500 focus:border-blue-500"
               disabled={isLoading}
-            />
+            >
+              <option value="" disabled>
+                Select a Department
+              </option>
+              <option value="Fiction">Fiction</option>
+              <option value="Non-Fiction">Non-Fiction</option>
+              <option value="Science">Science</option>
+              <option value="History">History</option>
+              <option value="Biography">Biography</option>
+            </select>
+            {yupErrors.department && (
+              <p className="text-red-500 text-sm mt-1">
+                {yupErrors.department}
+              </p>
+            )}
           </div>
+
           <button
             type="button"
             onClick={handleClick}

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import BookList from "../components/BookList";
 import AddBook from "../components/AddBook";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const MainDashboard = () => {
+  const navigate = useNavigate();
   return (
     <>
       <button
@@ -108,8 +110,13 @@ const MainDashboard = () => {
             </li>
             <li>
               <Link
-                to={"/"}
-                // onClick={() => setShowBookList(true)}
+                onClick={() => {
+                  toast.success("Logout Successfully..");
+                  setTimeout(() => {
+                    localStorage.clear();
+                    navigate("/");
+                  }, 1000);
+                }}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <img src="/7124045_logout_icon.png" className="h-7 w-7" />

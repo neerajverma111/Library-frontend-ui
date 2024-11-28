@@ -1,11 +1,9 @@
 import React, { useState, useEffect, createContext } from "react";
 import axios from "axios";
-// import { loginUser } from "../../../Backend/controllers/userController"
 export const UserAuth = createContext();
 
 export const UserAuthProvider = ({ children }) => {
   const [userSignUp, setUserSignUp] = useState([]);
-  // const [userLogin, setUserLogin] = useState([])
 
   const registerUser = async () => {
     try {

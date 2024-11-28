@@ -14,10 +14,6 @@ export const BookProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [totalBooks, setTotalBooks] = useState(0);
 
-  useEffect(() => {
-    getBooks();
-  }, []);
-
   const getBooks = async (page = 1) => {
     setIsLoading(true);
     try {
@@ -38,6 +34,7 @@ export const BookProvider = ({ children }) => {
     }
   };
 
+  
   return (
     <BookContext.Provider
       value={{

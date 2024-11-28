@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-import { apiUrl } from "../constants/Constant";
+import { apiUrl, jwtToken } from "../constants/Constant";
 
 export const UserContext = createContext();
 
@@ -16,7 +16,8 @@ export const UserProvider = ({ children }) => {
   const allUsers = async (page = 1) => {
     try {
       const response = await axios.get(
-        `http://${apiUrl}/users/admin/get-all-users?page=${page}&limit=${itemsPerPage}`
+        `http://${apiUrl}/users/admin/get-all-users?page=${page}&limit=${itemsPerPage}`,
+        jwtToken
       );
       if (response.status === 200) {
         setTotalPages(response?.data?.totalPages);
@@ -29,15 +30,6 @@ export const UserProvider = ({ children }) => {
       toast.error("Failed to fetch users.");
     }
   };
-
-  console.log("show user", showUsers);
-
-  // Fetch data on initial render
-  // useEffect(() => {
-  //   if (showUsers.length === 0) {
-  //     allUsers();
-  //   }
-  // }, [showUsers]);
 
   return (
     <UserContext.Provider
