@@ -1,4 +1,3 @@
-
 import React, { createContext, useState } from "react";
 import axios from "axios";
 import { apiUrl } from "../constants/Constant";
@@ -11,7 +10,7 @@ export const LoginUserProvider = ({ children }) => {
     email: "",
     password: "",
   });
-
+  const [error, setError] = useState(false);
 
   const [message, setMessage] = useState("");
 
@@ -24,6 +23,7 @@ export const LoginUserProvider = ({ children }) => {
 
       // return response.data
       if (response.status === 200) {
+        setError(false);
         console.log("response data ........", response.data);
         setMessage(response.data.message);
         console.log(response.data.token);
@@ -35,6 +35,7 @@ export const LoginUserProvider = ({ children }) => {
       }
       return { success: false, message: "Unexpected status code." };
     } catch (err) {
+      setError(true);
       setMessage("Login failed. Check credentials.");
       console.error("Error:", err.message);
       return { success: false, message: "Login failed." };
@@ -48,6 +49,7 @@ export const LoginUserProvider = ({ children }) => {
         setUserDetails,
         message,
         loginUser,
+        error,
       }}
     >
       {children}

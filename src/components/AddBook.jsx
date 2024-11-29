@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { apiUrl, jwtToken } from "../constants/Constant";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import SkeletonLoading from "../constants/Loading/SkeletonLoading";
 // Reducer function to handle updates to the state
 const bookDataReducer = (state, action) => {
   switch (action.type) {
@@ -94,7 +95,7 @@ const AddBook = () => {
   return (
     <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-2">
       {isLoading ? (
-        <h2 className="text-xl font-bold text-center">Loading...</h2>
+<SkeletonLoading/>
       ) : (
         <>
           <h1 className="text-xl font-bold mb-4">Add a Book</h1>

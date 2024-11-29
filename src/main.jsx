@@ -14,10 +14,10 @@ import { IssueBookProvider } from "./context/IssueContext";
 
 createRoot(document.getElementById("root")).render(
   <>
-    {/* <StrictMode> */}
     <ToastContainer
+      limit={1}
       position="top-right"
-      autoClose={3000}
+      autoClose={1000}
       hideProgressBar={false}
       newestOnTop={false}
       closeOnClick
@@ -37,6 +37,6 @@ createRoot(document.getElementById("root")).render(
         </LoginUserProvider>
       </BookProvider>
     </UserProvider>
-    {/* </StrictMode> */}
+
   </>
 );

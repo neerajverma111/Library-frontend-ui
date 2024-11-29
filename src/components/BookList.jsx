@@ -13,6 +13,7 @@ import { apiUrl, jwtToken } from "../constants/Constant";
 import { BookContext } from "../context/BookContext";
 import { Link } from "react-router-dom";
 import * as yup from "yup";
+import SkeletonLoading from "../constants/Loading/SkeletonLoading";
 
 const BookList = memo(() => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -286,7 +287,7 @@ const BookList = memo(() => {
                 />
               </div>
             ) : (
-              <p className="text-center text-gray-600">No books available.</p>
+<SkeletonLoading/>
             )}
           </div>
           {/* Modal */}
@@ -383,7 +384,7 @@ const BookList = memo(() => {
           )}
         </div>
       ) : (
-        <h2 className="text-xl font-bold text-center">Loading...</h2>
+      <SkeletonLoading/>
       )}
     </>
   );

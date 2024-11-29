@@ -12,11 +12,15 @@ import Signup from "./Auth/SignupUser.jsx";
 import LoginUser from "./Auth/LoginUser.jsx";
 import IssueBook from "./UserPanel/IssueBook.jsx";
 import UserBook from "./UserPanel/UserBook.jsx";
-import ReturnBook from "./UserPanel/ReturnBook.jsx";
+// import ReturnBook from "./UserPanel/ReturnBook.jsx";
 import AllThingsHere from "./components/AllThingsHere.jsx";
 import Payfine from "./UserPanel/Payfine.jsx";
 
-import { ProtectedRoute } from "./constants/ProtectedRoute.jsx";
+// const IssueBook = lazy(() => import("./UserPanel/IssueBook.jsx"));
+// const UserBook = lazy(() => import("./UserPanel/UserBook.jsx"));
+// const Payfine = lazy(() => import("./UserPanel/Payfine.jsx"));
+
+import { AuthGuard } from "./Auth/AuthGuard.jsx";
 
 function App() {
   return (
@@ -29,7 +33,6 @@ function App() {
 
           <Route path="/not-authorized" element={<Auth />} />
 
-          
           <Route path="/admin" element={<Admin />} />
 
           <Route element={<MainDashboard />}>
@@ -39,12 +42,11 @@ function App() {
             <Route path="/admin-dashboard" element={<AllThingsHere />} />
           </Route>
 
-          <Route element={<ProtectedRoute />}>
+          <Route element={<AuthGuard />}>
             <Route element={<User />}>
               <Route path="/user-dashboard" element={<UserBook />} />
-              <Route path="/issueBook" element={<IssueBook />} />
-              <Route path="/return-book" element={<ReturnBook />} />
               <Route path="/pay-fine" element={<Payfine />} />
+              <Route path="/issueBook" element={<IssueBook />} />
             </Route>
           </Route>
           <Route path="/add-book" element={<AddBook />} />
