@@ -24,14 +24,10 @@ export const LoginUserProvider = ({ children }) => {
       // return response.data
       if (response.status === 200) {
         console.log("response data ........", response);
-        setIsAdmin(response.data.isAdmin);
+        localStorage.setItem("isAdmin",response.data.isAdmin);
         setMessage(response.data.message);
         console.log(response.data.token);
         localStorage.setItem("token", response?.data?.token);
-        // localStorage.setItem("Admin", response?.data?.isAdmin);
-
-        // localStorage.setItem("userId", response?.data?.id);
-        // setJwtToken(response.data.token);
         return { success: true, message: "Login successful!" };
       }
       return { success: false, message: "Unexpected status code." };

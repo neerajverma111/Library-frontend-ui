@@ -14,7 +14,7 @@ import UserBook from "./UserPanel/UserBook.jsx";
 import ReturnBook from "./UserPanel/ReturnBook.jsx";
 import AllThingsHere from "./components/AllThingsHere.jsx";
 import Payfine from "./UserPanel/Payfine.jsx";
-
+import { AdminProtectedRoute } from "./constants/AdminProtectedRoute.jsx";
 import { ProtectedRoute } from "./constants/ProtectedRoute.jsx";
 
 function App() {
@@ -26,13 +26,17 @@ function App() {
           <Route path="/Signup" element={<Signup />} />
           <Route path="/not-authorized" element={<Auth />} />
           <Route path="/admin" element={<Admin />} />
-          <Route element={<ProtectedRoute />}>
-            <Route element={<MainDashboard />}>
+
+          <Route element={<MainDashboard />}>
+            {/* <Route element={<AdminProtectedRoute />}> */}
               <Route path="/book-list" element={<BookList />} />
               <Route path="/add-book" element={<AddBook />} />
               <Route path="/user-list" element={<WhitelistUsers />} />
               <Route path="/admin-dashboard" element={<AllThingsHere />} />
-            </Route>
+            {/* </Route> */}
+          </Route>
+
+          <Route element={<ProtectedRoute />}>
             <Route element={<User />}>
               <Route path="/user-dashboard" element={<UserBook />} />
               <Route path="/issueBook" element={<IssueBook />} />
@@ -40,6 +44,7 @@ function App() {
               <Route path="/pay-fine" element={<Payfine />} />
             </Route>
           </Route>
+
           <Route path="/add-book" element={<AddBook />} />
         </Routes>
       </Router>
