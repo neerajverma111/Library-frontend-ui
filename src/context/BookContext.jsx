@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { apiUrl } from "../constants/Constant";
 import { toast } from "react-toastify";
@@ -33,8 +33,9 @@ export const BookProvider = ({ children }) => {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
-    if (data.length === 0) {
+    if (!data.length) {
       getBooks();
     }
   }, [data]);

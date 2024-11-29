@@ -15,12 +15,12 @@ import { BookContext } from "../context/BookContext";
 import { Link } from "react-router-dom";
 import * as yup from "yup";
 import { ErrorMessage, Formik } from "formik";
+import InputFields from "../constants/InputFields";
 
 const BookList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [book, setBook] = useState(null);
-  const [namesss, setName] = useState("");
 
   const {
     data,
@@ -263,7 +263,7 @@ const BookList = () => {
                   }) => (
                     <form onSubmit={handleSubmit}>
                       <label className="block mb-2 text-sm">Book Name</label>
-                      <input
+                      <InputFields
                         name="newBookName"
                         type="text"
                         className="w-full mb-4 p-2 border rounded"
@@ -273,12 +273,12 @@ const BookList = () => {
                         maxLength={30}
                         disabled={isSubmitting}
                       />
-                      {/* {touched.newBookName && errors.newBookName && ( */}
-                        {/* // <p className="text-red-500 text-sm mt-1">
-                        //   {errors.newBookName}
-                        // </p> */}
-                        <ErrorMessage className="text-red-500 text-sm mt-1" name="newBookName"/>
-                      {/* )} */}
+                      {touched.newBookName && errors.newBookName && (  
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.newBookName}
+                          </p>
+                        // {/* <ErrorMessage className="text-red-500 text-sm mt-1" name="newBookName"/> */}
+                        )}
 
                       <label className="block mb-2 text-sm">Department</label>
                       <select
@@ -303,7 +303,7 @@ const BookList = () => {
                       )}
 
                       <label className="block mb-2 text-sm">Quantity</label>
-                      <input
+                      <InputFields
                         name="newQuantity"
                         type="number"
                         className="w-full mb-4 p-2 border rounded"

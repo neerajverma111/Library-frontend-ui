@@ -8,6 +8,7 @@ import { UserProvider } from "./context/UserContext";
 import { BookProvider } from "./context/BookContext";
 import { LoginUserProvider } from "./context/LoginUser";
 import { IssueBookProvider } from "./context/IssueContext";
+import { AdminDataCountProvider } from "./context/AdminDataCountContext";
 
 // import BookList from "./components/BookList";
 // import { UserAuthProvider } from "./context/LoginSignupContext";
@@ -31,11 +32,13 @@ createRoot(document.getElementById("root")).render(
     />
     <UserProvider>
       <BookProvider>
-        <LoginUserProvider>
-          <IssueBookProvider>
-            <App />
-          </IssueBookProvider>
-        </LoginUserProvider>
+        <AdminDataCountProvider>
+          <LoginUserProvider>
+            <IssueBookProvider>
+              <App />
+            </IssueBookProvider>
+          </LoginUserProvider>
+        </AdminDataCountProvider>
       </BookProvider>
     </UserProvider>
     {/* </StrictMode> */}

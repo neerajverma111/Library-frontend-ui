@@ -5,6 +5,7 @@ import { apiUrl, jwtToken } from "../constants/Constant";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { Formik } from "formik";
+import InputFields from "../constants/InputFields";
 
 const AddBook = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +83,7 @@ const AddBook = () => {
                 >
                   Book Name:
                 </label>
-                <input
+                <InputFields
                   id="book-name"
                   name="bookName"
                   value={values.bookName}
@@ -101,7 +102,7 @@ const AddBook = () => {
                 <label htmlFor="quantity" className="block text-sm font-medium">
                   Quantity:
                 </label>
-                <input
+                <InputFields
                   id="quantity"
                   name="quantity"
                   value={values.quantity}

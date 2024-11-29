@@ -9,7 +9,10 @@ const InputField = ({
   onChange,
   placeholder,
   onInput,
-  onBlur
+  onBlur,
+  className,
+  maxLength,
+  disabled
 }) => {
   return (
     <div className="mb-4">
@@ -17,16 +20,18 @@ const InputField = ({
         {label}
       </label>
       <input
+        name={name}
         type={type}
         id={id}
-        name={name}
+        className={`${className ? className : "w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }`}
         value={value}
+        maxLength={maxLength || ""}
         onChange={onChange}
         placeholder={placeholder}
+        disabled ={disabled || false}
         onInput={onInput}
         onBlur={onBlur}
         required
-        className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
     </div>
   );

@@ -1,34 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { apiUrl, jwtToken } from "../constants/Constant";
+import AdminDataCountContext from "../context/AdminDataCountContext";
 
 const AllThingsHere = () => {
-  const [count, setCount] = useState({
-    booksCount: "",
-    usersCount: "",
-  });
-  const getCount = async () => {
-    try {
-      const response = await axios.get(
-        `http://${apiUrl}/users/admin/count-book-user`,
-        jwtToken
-      );
-      if (response.status === 200) {
-        setCount({
-          booksCount: response.data.books,
-          usersCount: response.data.users,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching users:", error.message);
-      toast.error("Failed to fetch users.");
-    }
-  };
-
-  useEffect(() => {
-    getCount();
-  }, []);
+  const { count } = useContext(AdminDataCountContext);
 
   return (
     <div className="p-6">

@@ -8,15 +8,21 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 
 const LoginUser = () => {
-  const { loginUser } = useContext(LoginUserContext);
+  const { loginUser, isAdmin } = useContext(LoginUserContext);
   const navigate = useNavigate();
 
   const handleFormSubmit = async (values, { setSubmitting }) => {
     setSubmitting(true);
     const result = await loginUser(values); // Pass values directly
+    console.log(isAdmin);
     if (result.success === true) {
-      toast.success(result.message);
-      navigate("/user-dashboard");
+      if (isAdmin) {
+        toast.success(result.message);
+        navigate("/admin-dashboard");
+      } else {
+        toast.success(result.message);
+        navigate("/user-dashboard");
+      }
     } else {
       toast.error(result.message);
       navigate("/not-authorized");

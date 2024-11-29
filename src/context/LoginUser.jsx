@@ -1,4 +1,3 @@
-
 import React, { createContext, useState } from "react";
 import axios from "axios";
 import { apiUrl } from "../constants/Constant";
@@ -12,22 +11,24 @@ export const LoginUserProvider = ({ children }) => {
     password: "",
   });
 
-
   const [message, setMessage] = useState("");
+  const [isAdmin, setIsAdmin] = useState("");
 
-  const loginUser = async () => {
+  const loginUser = async (values) => {
     try {
       const response = await axios.post(`http://${apiUrl}/users/login`, {
-        email: userDetails.email,
-        password: userDetails.password,
+        email: values.email,
+        password: values.password,
       });
 
       // return response.data
       if (response.status === 200) {
-        console.log("response data ........", response.data);
+        console.log("response data ........", response);
+        setIsAdmin(response.data.isAdmin);
         setMessage(response.data.message);
         console.log(response.data.token);
         localStorage.setItem("token", response?.data?.token);
+        // localStorage.setItem("Admin", response?.data?.isAdmin);
 
         // localStorage.setItem("userId", response?.data?.id);
         // setJwtToken(response.data.token);
@@ -40,7 +41,6 @@ export const LoginUserProvider = ({ children }) => {
       return { success: false, message: "Login failed." };
     }
   };
-
   return (
     <LoginUserContext.Provider
       value={{
@@ -48,6 +48,7 @@ export const LoginUserProvider = ({ children }) => {
         setUserDetails,
         message,
         loginUser,
+        isAdmin,
       }}
     >
       {children}
