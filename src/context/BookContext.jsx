@@ -33,8 +33,12 @@ export const BookProvider = ({ children }) => {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    if (data.length === 0) {
+      getBooks();
+    }
+  }, [data]);
 
-  
   return (
     <BookContext.Provider
       value={{

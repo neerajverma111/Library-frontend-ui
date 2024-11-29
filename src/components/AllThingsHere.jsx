@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { apiUrl, jwtToken, token } from "../constants/Constant";
+import { apiUrl, jwtToken } from "../constants/Constant";
+
 const AllThingsHere = () => {
   const [count, setCount] = useState({
     booksCount: "",

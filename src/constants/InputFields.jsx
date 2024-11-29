@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 const InputField = ({
   label,
   type,
@@ -6,7 +8,8 @@ const InputField = ({
   value,
   onChange,
   placeholder,
-  onInput
+  onInput,
+  onBlur
 }) => {
   return (
     <div className="mb-4">
@@ -21,6 +24,7 @@ const InputField = ({
         onChange={onChange}
         placeholder={placeholder}
         onInput={onInput}
+        onBlur={onBlur}
         required
         className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
@@ -28,4 +32,4 @@ const InputField = ({
   );
 };
 
-export default InputField;
+export default memo(InputField);
