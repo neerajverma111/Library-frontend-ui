@@ -7,11 +7,12 @@ import App from "./App";
 import { UserProvider } from "./context/UserContext";
 import { BookProvider } from "./context/BookContext";
 import { LoginUserProvider } from "./context/LoginUser";
-import { IssueBookProvider } from "./context/IssueContext";
+// import { IssueBookProvider } from "./context/IssueContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // import BookList from "./components/BookList";
 // import { UserAuthProvider } from "./context/LoginSignupContext";
-
+const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <>
     <ToastContainer
@@ -31,12 +32,15 @@ createRoot(document.getElementById("root")).render(
     <UserProvider>
       <BookProvider>
         <LoginUserProvider>
-          <IssueBookProvider>
-            <App />
-          </IssueBookProvider>
+          {/* <IssueBookProvider> */}
+            <QueryClientProvider client={queryClient}>
+              <App />
+            </QueryClientProvider>
+          {/* </IssueBookProvider> */}
         </LoginUserProvider>
       </BookProvider>
     </UserProvider>
 
+    {/* <App /> */}
   </>
 );

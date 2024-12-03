@@ -12,34 +12,36 @@ export const IssueBookProvider = ({ children }) => {
 
   const getIssueBook = async () => {
     const userId = decodeToken(jwtToken).data.id;
-    try {
-      const response = await axios.get(
-        `http://${apiUrl}/issues/userIssuedBooks/${userId}`,
+    //  debugger
+    // try {
+    //   const response = await axios.get(
+    //     `http://${apiUrl}/issues/userIssuedBooks/${userId}`,
 
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-          },
-        }
-      );
-      if (response.status === 200) {
-        // console.log("response", response?.data);
-        setUserBookId(response?.data?.issues);
-        toast.success(response?.data?.message);
-      }
-    } catch (error) {
-      console.error(
-        "Error fetching issued books:",
-        error.response || error.message || error
-      );
-      toast.error("Issue A Book First");
-    }
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${jwtToken}`,
+    //       },
+    //     }
+    //   );
+    //   if (response.status === 200) {
+    //     // console.log("response", response?.data);
+    //     setUserBookId(response?.data?.issues);
+    //     toast.success(response?.data?.message);
+    //   }
+    // } catch (error) {
+    //   console.error(
+    //     "Error fetching issued books:",
+    //     error.response || error.message || error
+    //   );
+    //   toast.error("Issue A Book First");
+    // }
   };
   // console.log(userBookId);
 
   useEffect(() => {
     getIssueBook();
   }, []);
+  // console.log(getIssueBook);
 
   return (
     <IssueContext.Provider value={{ userBookId, getIssueBook }}>

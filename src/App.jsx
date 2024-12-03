@@ -20,7 +20,7 @@ import Payfine from "./UserPanel/Payfine.jsx";
 // const UserBook = lazy(() => import("./UserPanel/UserBook.jsx"));
 // const Payfine = lazy(() => import("./UserPanel/Payfine.jsx"));
 
-import { AuthGuard } from "./Auth/AuthGuard.jsx";
+// import { AuthGuard } from "./Auth/AuthGuard.jsx";
 
 function App() {
   return (
@@ -42,12 +42,12 @@ function App() {
             <Route path="/admin-dashboard" element={<AllThingsHere />} />
           </Route>
 
-          <Route element={<AuthGuard />}>
-            <Route element={<User />}>
-              <Route path="/user-dashboard" element={<UserBook />} />
-              <Route path="/pay-fine" element={<Payfine />} />
-              <Route path="/issueBook" element={<IssueBook />} />
-            </Route>
+          {/* <Route element={<AuthGuard />}> */}
+          <Route element={<User />}>
+            <Route path="/user-dashboard" element={<UserBook />} />
+            <Route path="/pay-fine" element={<Payfine />} />
+            <Route path="/issueBook" element={<IssueBook />} />
+            {/* </Route> */}
           </Route>
           <Route path="/add-book" element={<AddBook />} />
         </Routes>

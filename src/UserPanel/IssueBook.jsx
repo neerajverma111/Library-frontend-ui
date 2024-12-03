@@ -7,55 +7,72 @@ import { IssueContext } from "../context/IssueContext";
 import "react-loading-skeleton/dist/skeleton.css";
 import SkeletonLoading from "../constants/Loading/SkeletonLoading";
 import TableRow from "../components/TableRow";
+import { useQuery } from "@tanstack/react-query";
+import { getIssueBook } from "../Api/Api";
 // import { throttle } from "../constants/Constant";
 const IssuedBooks = () => {
-  const { userBookId, getIssueBook } = useContext(IssueContext);
-  const memoizedUserBookId = useMemo(() => userBookId, [userBookId]);
+  // const { userBookId, getIssueBook } = useContext(IssueContext);
 
   const [returnBook, setReturnBook] = useState();
 
+  // console.log(returnBook);
+
   const [Loading, setLoading] = useState(false);
 
-  const fetchReturn = useCallback(async (id) => {
-    const jwtToken = localStorage.getItem("token");
+  const { data, isError, error, isLoading } = useQuery({
+    queryKey: ["issueBook"],
+    queryFn: getIssueBook,
+    staleTime: 1000 * 60 * 60, // 1 hour
+    cacheTime: 1000 * 60 * 60 * 24,
+  });
 
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        `http://${apiUrl}/issues/returnBook`,
-        {
-          issueId: id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-          },
-        }
-      );
-      setLoading(true);
-      if (response.status === 200) {
-        console.log("this is issue id ", id);
-        setReturnBook(response?.data);
-        console.log(response);
-        toast.success(response?.data?.message);
-      }
-      setLoading(false);
-      getIssueBook();
-    } catch (err) {
-      setLoading(false);
-      if (err.response.data.message === "jwt expired") {
-        localStorage.clear();
-        setTimeout(() => {
-          navigate("/");
-        }, 3000);
-      }
-      // getIssueBook();
-      console.error("Response Status:", err.response.status);
-      console.error("Response Data:", err.response.data);
-      setLoading(false);
-      toast.error(err.response.data.message || "Something went wrong!");
-    }
-  }, []);
+  if (isError) {
+    console.log("errorr occoure whiule fetching api issue book " + error.stack);
+  }
+
+  // console.log("this is data .....", data, isLoading);
+  // const memoizedUserBookId = useMemo(() => data, [data]);
+
+  // const fetchReturn = useCallback(async (id) => {
+  //   const jwtToken = localStorage.getItem("token");
+
+  //   try {
+  //     setLoading(true);
+  //     const response = await axios.post(
+  //       `http://${apiUrl}/issues/returnBook`,
+  //       {
+  //         issueId: id,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${jwtToken}`,
+  //         },
+  //       }
+  //     );
+  //     setLoading(true);
+  //     if (response.status === 200) {
+  //       console.log("this is issue id ", id);
+  //       setReturnBook(response?.data);
+  //       console.log(response);
+  //       toast.success(response?.data?.message);
+  //     }
+  //     setLoading(false);
+  //     getIssueBook();
+  //   } catch (err) {
+  //     setLoading(false);
+  //     if (err.response.data.message === "jwt expired") {
+  //       localStorage.clear();
+  //       setTimeout(() => {
+  //         navigate("/");
+  //       }, 3000);
+  //     }
+  //     // getIssueBook();
+  //     console.error("Response Status:", err.response.status);
+  //     console.error("Response Data:", err.response.data);
+  //     setLoading(false);
+  //     toast.error(err.response.data.message || "Something went wrong!");
+  //   }
+  // }, []);
 
   // const throttleReturn = throttle((id) => {
   //   return fetchReturn(id);
@@ -68,7 +85,7 @@ const IssuedBooks = () => {
         <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
           <h2 className="text-3xl font-bold mb-4">Issued Books</h2>
 
-          {userBookId && userBookId.length > 0 ? (
+          {data && data.length > 0 ? (
             <table className="min-w-full text-left text-sm border border-gray-200 bg-white rounded-lg shadow-md">
               <thead className="bg-gray-100 text-gray-700">
                 <tr className="text-center">
@@ -80,13 +97,13 @@ const IssuedBooks = () => {
                 </tr>
               </thead>
               <tbody>
-                {memoizedUserBookId.map((book, idx) => (
+                {data.map((book, idx) => (
                   <TableRow
                     key={book.id}
                     bookName={book.Book.name}
                     book={book}
                     idx={idx}
-                    fetchReturn={fetchReturn}
+                    // fetchReturn={}
                   />
                 ))}
               </tbody>

@@ -8,9 +8,29 @@ import axios from "axios";
 import moment from "moment-timezone";
 import SkeletonLoading from "../constants/Loading/SkeletonLoading";
 import { throttle } from "../constants/Constant";
+import { useQueryClient } from "@tanstack/react-query";
+// import { getIssueBook } from "../Api/Api";
+// import { getIssueBook } from "../Api/Api";
 
 const Payfine = () => {
-  const { userBookId, getIssueBook } = useContext(IssueContext);
+  // const { userBookId, getIssueBook } = useContext(IssueContext);
+  // console.log("object");
+  // debugger;
+  // const queryClient = useQueryClient();
+  // const { data, isLoading, Loading, isError, error } = useQuery({
+  //   queryKey: ["issueBook"],
+  //   queryFn: getIssueBook,
+  // });
+
+  // console.log("data", data);
+  const queryClient = useQueryClient();
+
+  const cachedData = queryClient.getQueryData(
+    ["issueBook"]
+  );
+
+
+  // console.log("datatatatatata", cachedData);
   const jwtToken = localStorage.getItem("token");
   const [fineMessage, setFineMessage] = useState();
   const [Loading, setLoading] = useState(false);
@@ -38,7 +58,7 @@ const Payfine = () => {
 
         setLoading(false);
       }
-      getIssueBook();
+      // getIssueBook();
     } catch (err) {
       if (err.status === 400) {
         toast.error(err.response.data.message);
@@ -67,7 +87,7 @@ const Payfine = () => {
         <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
           <h2 className="text-3xl font-bold mb-4">Books Fine's</h2>
 
-          {userBookId && userBookId.length > 0 ? (
+          {cachedData && cachedData.length > 0 ? (
             <table className="min-w-full text-left text-sm border border-gray-200 bg-white rounded-lg shadow-md">
               <thead className="bg-gray-100 text-gray-700">
                 <tr className="text-center">
@@ -79,7 +99,7 @@ const Payfine = () => {
                 </tr>
               </thead>
               <tbody>
-                {userBookId.map((book, idx) => (
+                {cachedData.map((book, idx) => (
                   <tr
                     key={idx}
                     className="border-t hover:bg-gray-50 transition duration-200 text-center"

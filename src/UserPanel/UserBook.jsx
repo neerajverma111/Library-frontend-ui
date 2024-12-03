@@ -16,11 +16,10 @@ const UserBook = () => {
     getBooks,
     totalPages,
     currentPage,
-    issuedBooks,
     setIssuedBooks,
     isLoading,
     setCurrentPage,
-    setIsLoading,
+    IsLoading,
   } = useContext(BookContext);
   // const { users } = useContext(UserContext);
   const [issueDetails, setIssueDetails] = useState({
@@ -31,11 +30,10 @@ const UserBook = () => {
   //   getBooks();
   // }, [!issueDetails.userId]);
   const jwtToken = localStorage.getItem("token");
-
   const loggedInUser = jwtToken ? decodeToken(jwtToken) : null;
 
   const issueBook = async () => {
-    setIsLoading(true);
+    IsLoading;
     try {
       const response = await axios.post(
         `http://${apiUrl}/issues/issueBook`,
@@ -70,7 +68,7 @@ const UserBook = () => {
         toast.error("Network error or server not reachable");
       }
     } finally {
-      setIsLoading(false);
+      isLoading(false);
     }
   };
 
@@ -91,6 +89,7 @@ const UserBook = () => {
 
   return (
     <>
+      {/* <h1>Hello</h1> */}
       {isLoading ? (
         <SkeletonLoading />
       ) : (
@@ -126,7 +125,6 @@ const UserBook = () => {
                 id="default-search"
                 class="block w-[300px] h-12 p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Novel"
-              
               />
               <button
                 type="submit"
