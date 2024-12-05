@@ -7,3 +7,4 @@ export const jwtToken = {
     Authorization: `Bearer ${token}`,
   },
 };
+export const jwtToken2 = token;

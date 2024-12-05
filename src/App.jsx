@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Profiler } from "react";
 import Auth from "./Auth/Auth.jsx";
 import User from "./UserPanel/User.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -18,6 +18,18 @@ import { AdminProtectedRoute } from "./constants/AdminProtectedRoute.jsx";
 import { ProtectedRoute } from "./constants/ProtectedRoute.jsx";
 
 function App() {
+  // const onRender = (
+  //   id, // The "id" prop of the Profiler tree that has just committed
+  //   phase, // Either "mount" (initial render) or "update" (re-render)
+  //   actualDuration, // Time spent rendering the committed update
+  //   baseDuration, // Estimated time to render the entire subtree without memoization
+  //   startTime, // When React started rendering this update
+  //   commitTime, // When React committed this update
+  //   interactions // The interactions that were part of this update
+  // ) => {
+  //   console.log("Profiler Log:", { id, phase, actualDuration });
+  // };
+
   return (
     <>
       <Router>
@@ -29,10 +41,10 @@ function App() {
 
           <Route element={<MainDashboard />}>
             {/* <Route element={<AdminProtectedRoute />}> */}
-              <Route path="/book-list" element={<BookList />} />
-              <Route path="/add-book" element={<AddBook />} />
-              <Route path="/user-list" element={<WhitelistUsers />} />
-              <Route path="/admin-dashboard" element={<AllThingsHere />} />
+            <Route path="/book-list" element={<BookList />} />
+            <Route path="/add-book" element={<AddBook />} />
+            <Route path="/user-list" element={<WhitelistUsers />} />
+            <Route path="/admin-dashboard" element={<AllThingsHere />} />
             {/* </Route> */}
           </Route>
 

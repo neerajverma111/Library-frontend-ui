@@ -13,7 +13,6 @@ export const BookProvider = ({ children }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [totalBooks, setTotalBooks] = useState(0);
-
   const getBooks = async (page = 1) => {
     setIsLoading(true);
     try {

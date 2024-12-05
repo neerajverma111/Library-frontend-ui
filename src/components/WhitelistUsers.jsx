@@ -1,20 +1,17 @@
-import axios from "axios";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { apiUrl, jwtToken } from "../constants/Constant";
 import ReactPaginate from "react-paginate";
-import { UserContext } from "../context/UserContext";
-
+import { useGetAllUsersQuery } from "../react-redux/rtkQuery/usersApi";
+import { apiUrl, jwtToken } from "../constants/Constant";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const WhitelistUsers = () => {
-  const {
-    isLoading,
-    showUsers,
-    currentPage,
-    totalPages,
-    setCurrentPage,
-    allUsers,
-  } = useContext(UserContext);
-
+  const [page, setPage] = useState(1);
+  const { data, error, isLoading, refetch } = useGetAllUsersQuery({
+    page,
+    itemsPerPage: 8,
+  });
+  const navigate = useNavigate();
   const updateUser = async (userId, isChecked) => {
     try {
       const response = await axios.put(
@@ -24,39 +21,44 @@ const WhitelistUsers = () => {
       );
       if (response.status) {
         toast.success(response.data.message);
-        allUsers();
+        refetch();
+        // getAllUsers();
+        // data;
+      } else {
+        navigate("/");
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      navigate("/");
+    }
   };
 
-  const handlePageClick = useCallback(
-    (event) => {
-      const newPage = event.selected + 1;
-      setCurrentPage(newPage);
-      allUsers(newPage);
-    },
-    [setCurrentPage, allUsers]
-  );
+  // Function to handle page change
+  const handlePageClick = (event) => {
+    setPage(event.selected + 1);
+  };
 
-  const handleCheck = useCallback(
-    (userId, isChecked) => {
-      updateUser(userId, isChecked);
-    },
-    [updateUser]
-  );
+  const handleCheck = (userId, isChecked) => {
+    updateUser(userId, isChecked);
+  };
 
   useEffect(() => {
-    if (showUsers.length === 0) {
-      allUsers(currentPage); // Fetch users once when the component mounts
+    if (data && data.users.length === 0) {
+      toast.info("No users available.");
     }
-  }, [showUsers]);
+  }, [data]);
+
   return (
     <>
       {isLoading ? (
         <h2 className="text-xl font-bold text-center">Loading...</h2>
+      ) : error ? (
+        <h2 className="text-xl font-bold text-center text-red-500">
+          Error loading data
+        </h2>
       ) : (
         <div className="overflow-x-auto bg-gray-800 p-6 rounded-lg shadow-lg">
-          {showUsers.length > 0 ? (
+          {data?.users?.length > 0 ? (
             <>
               <table className="min-w-full table-auto text-gray-300">
                 <thead className="bg-gray-900 text-left">
@@ -69,7 +71,7 @@ const WhitelistUsers = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {showUsers.map((value, index) => (
+                  {data.users.map((value, index) => (
                     <tr
                       key={index}
                       className="border-b border-gray-700 hover:bg-gray-700"
@@ -77,12 +79,10 @@ const WhitelistUsers = () => {
                       <td className="px-4 py-2 font-bold">{value.id}</td>
                       <td className="px-4 py-2 font-bold">{value?.name}</td>
                       <td className="px-4 py-2 font-bold">
-                        {value?.booksIssued ? value?.booksIssued : "N/A"}
+                        {value?.booksIssued || "N/A"}
                       </td>
                       <td className="px-4 py-2 font-bold">
-                        {value?.outstandingFine
-                          ? value?.outstandingFine
-                          : "N/A"}
+                        {value?.outstandingFine || "N/A"}
                       </td>
                       <td className="px-4 py-2 font-bold">
                         <select
@@ -110,9 +110,9 @@ const WhitelistUsers = () => {
               <ReactPaginate
                 previousLabel={
                   <button
-                    disabled={currentPage === 1}
+                    disabled={page === 1}
                     className={`px-4 py-2 text-sm font-medium text-white ${
-                      currentPage === 1
+                      page === 1
                         ? "bg-gray-300 cursor-not-allowed"
                         : "bg-gray-600 hover:bg-gray-700"
                     } rounded `}
@@ -122,9 +122,9 @@ const WhitelistUsers = () => {
                 }
                 nextLabel={
                   <button
-                    disabled={currentPage === totalPages} // Disable button on the last page
+                    disabled={page === data?.totalPages}
                     className={`px-4 py-2 text-sm font-medium text-white ${
-                      currentPage === totalPages
+                      page === data?.totalPages
                         ? "bg-gray-300 cursor-not-allowed"
                         : "bg-gray-600 hover:bg-gray-700"
                     } rounded`}
@@ -132,22 +132,15 @@ const WhitelistUsers = () => {
                     Next
                   </button>
                 }
-                breakLabel={
-                  <span className="px-3 py-2 text-sm font-medium text-gray-500">
-                    ...
-                  </span>
-                }
-                pageCount={totalPages}
+                pageCount={data?.totalPages || 1}
                 marginPagesDisplayed={2}
                 pageRangeDisplayed={3}
                 onPageChange={handlePageClick}
-                containerClassName={"flex justify-center mt-6 space-x-2"}
-                pageClassName={
-                  "px-4 py-2 text-sm font-medium border rounded hover:bg-blue-100 text-gray-700 bg-blue"
-                }
-                activeClassName={"bg-blue-500 text-white border-blue-500"}
-                disabledClassName={"opacity-50 cursor-not-allowed"}
-                forcePage={currentPage - 1}
+                containerClassName="flex justify-center mt-6 space-x-2"
+                pageClassName="px-4 py-2 text-sm font-medium border rounded hover:bg-blue-100 text-gray-700"
+                activeClassName="bg-blue-500 text-white"
+                disabledClassName="opacity-50 cursor-not-allowed"
+                forcePage={page - 1}
               />
             </>
           ) : (

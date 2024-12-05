@@ -9,6 +9,8 @@ import { BookProvider } from "./context/BookContext";
 import { LoginUserProvider } from "./context/LoginUser";
 import { IssueBookProvider } from "./context/IssueContext";
 import { AdminDataCountProvider } from "./context/AdminDataCountContext";
+import { Provider } from "react-redux";
+import { store } from "./react-redux/store";
 
 // import BookList from "./components/BookList";
 // import { UserAuthProvider } from "./context/LoginSignupContext";
@@ -35,7 +37,9 @@ createRoot(document.getElementById("root")).render(
         <AdminDataCountProvider>
           <LoginUserProvider>
             <IssueBookProvider>
+            <Provider store={store}>
               <App />
+              </Provider>
             </IssueBookProvider>
           </LoginUserProvider>
         </AdminDataCountProvider>

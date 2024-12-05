@@ -1,39 +1,38 @@
 import axios from "axios";
-import React, {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { apiUrl, jwtToken } from "../constants/Constant";
-import { BookContext } from "../context/BookContext";
 import { Link } from "react-router-dom";
 import * as yup from "yup";
-import { ErrorMessage, Formik } from "formik";
+import { Formik } from "formik";
 import InputFields from "../constants/InputFields";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setCurrentPage,
+  startLoading,
+  stopLoading,
+} from "../react-redux/bookSlice";
+import { useBooks } from "../hooks/useBook";
 
 const BookList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [book, setBook] = useState(null);
+  const dispatch = useDispatch();
+  const { data, isLoading, currentPage, totalPages } = useSelector(
+    (state) => state.book
+  );
+  const { getBooks } = useBooks();
 
-  const {
-    data,
-    getBooks,
-    totalPages,
-    currentPage,
-    isLoading,
-    setCurrentPage,
-    setIsLoading,
-  } = useContext(BookContext);
+  useEffect(() => {
+    if (data.length === 0) {
+      getBooks(currentPage);
+    }
+  }, [data, currentPage]);
 
   const updateBook = async (values) => {
-    setIsLoading(true);
+    dispatch(startLoading());
     try {
       const response = await axios.put(
         `http://${apiUrl}/users/admin/update-book`,
@@ -53,36 +52,29 @@ const BookList = () => {
     } catch (error) {
       console.log("Error in Book List", error.message);
     } finally {
-      setIsLoading(false);
+      dispatch(stopLoading());
     }
   };
 
   const isClickedRef = useRef(false);
-  
+
   const handleEditClick = useCallback((book) => {
     setSelectedBook(book);
     isClickedRef.current = true;
     setIsModalOpen(true);
   }, []);
 
-  // console.log(handleEditClick)
-
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedBook(null);
   }, []);
 
-  const handlePageClick = useCallback((event) => {
+  const handlePageClick = (event) => {
     const newPage = event.selected + 1; // Convert 0-indexed to 1-indexed
-    setCurrentPage(newPage);
-    getBooks(newPage);
-  }, []);
+    dispatch(setCurrentPage(newPage));
+    dispatch(getBooks(newPage));
+  };
 
-  useEffect(() => {
-    if (data.length === 0) {
-      getBooks(currentPage);
-    }
-  }, [data]);
   return (
     <>
       {!isLoading ? (
@@ -175,6 +167,7 @@ const BookList = () => {
                   previousLabel={
                     <button
                       disabled={currentPage === 1}
+                      onClick={() => handlePageClick()}
                       className={`px-4 py-2 text-sm font-medium text-white ${
                         currentPage === 1
                           ? "bg-gray-300 cursor-not-allowed"
@@ -187,6 +180,7 @@ const BookList = () => {
                   nextLabel={
                     <button
                       disabled={currentPage === totalPages}
+                      onClick={() => handlePageClick()}
                       className={`px-4 py-2 text-sm font-medium text-white ${
                         currentPage === totalPages
                           ? "bg-gray-300 cursor-not-allowed"
@@ -223,6 +217,7 @@ const BookList = () => {
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white p-6 rounded-lg w-96">
                 <h3 className="text-lg font-semibold mb-4">Edit Book</h3>
+                <>{console.log("first")}</>
                 <Formik
                   initialValues={{
                     newBookName: selectedBook?.name || "",
@@ -273,12 +268,12 @@ const BookList = () => {
                         maxLength={30}
                         disabled={isSubmitting}
                       />
-                      {touched.newBookName && errors.newBookName && (  
+                      {touched.newBookName && errors.newBookName && (
                         <p className="text-red-500 text-sm mt-1">
                           {errors.newBookName}
-                          </p>
+                        </p>
                         // {/* <ErrorMessage className="text-red-500 text-sm mt-1" name="newBookName"/> */}
-                        )}
+                      )}
 
                       <label className="block mb-2 text-sm">Department</label>
                       <select
