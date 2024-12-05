@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { apiUrl, token } from "../../constants/Constant";
-import { useNavigate } from "react-router-dom";
+import { apiUrl } from "../../constants/Constant";
 import { toast } from "react-toastify";
 
 export const usersApi = createApi({
@@ -20,9 +19,9 @@ export const usersApi = createApi({
   endpoints: (builder) => ({
     getAllUsers: builder.query({
       query: ({ page = 1, itemsPerPage }) => ({
-        url: 'users/admin/get-all-users',
+        url: "users/admin/get-all-users",
         params: { page, limit: itemsPerPage },
-        method: 'GET',
+        method: "GET",
       }),
       transformResponse: (response) => {
         if (response?.status === 200) {
@@ -32,9 +31,8 @@ export const usersApi = createApi({
             users: response.data.users,
             currentPage: response.data.currentPage,
           };
-        } else if(response.status === 500){
+        } else if (response.status === 500) {
           toast.error("Token Expired");
-          navigate('/');
         }
         return response;
       },
