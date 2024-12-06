@@ -8,29 +8,25 @@ import * as yup from "yup";
 import { Formik } from "formik";
 import InputFields from "../constants/InputFields";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setCurrentPage,
-  startLoading,
-  stopLoading,
-} from "../react-redux/bookSlice";
-import { useBooks } from "../hooks/useBook";
+import { startLoading, stopLoading } from "../react-redux/bookSlice";
+import { useGetBooksQuery } from "../react-redux/rtkQuery/usersApi";
 
 const BookList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [book, setBook] = useState(null);
   const dispatch = useDispatch();
-  const { data, isLoading, currentPage, totalPages } = useSelector(
-    (state) => state.book
-  );
-  const { getBooks } = useBooks();
-
-  useEffect(() => {
-    if (data.length === 0) {
-      getBooks(currentPage);
-    }
-  }, [data, currentPage]);
-
+  const [page, setPage] = useState(1);
+  const itemsPerPage = useSelector((state) => state.book.itemsPerPage);
+  const {
+    data: booksData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetBooksQuery({
+    page,
+    itemsPerPage,
+  });
   const updateBook = async (values) => {
     dispatch(startLoading());
     try {
@@ -46,7 +42,7 @@ const BookList = () => {
       );
       if (response.status === 201) {
         toast.success(response.data.name);
-        getBooks();
+        refetch();
         handleCloseModal();
       }
     } catch (error) {
@@ -70,14 +66,16 @@ const BookList = () => {
   }, []);
 
   const handlePageClick = (event) => {
-    const newPage = event.selected + 1; // Convert 0-indexed to 1-indexed
-    dispatch(setCurrentPage(newPage));
-    dispatch(getBooks(newPage));
+    const newPage = event.selected + 1;
+    setPage(newPage);
   };
-
+  if (isLoading)
+    return <h2 className="text-xl font-bold text-center">Loading...</h2>;
+  if (isError) return <div>Error loading books</div>;
+  if (!booksData?.books) return <div>No books found</div>;
   return (
     <>
-      {!isLoading ? (
+      {/* {!isLoading ? ( */}
         <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
           <div className="w-full ">
             <div className="flex items-center justify-between mb-2">
@@ -88,7 +86,7 @@ const BookList = () => {
                 </button>
               </Link>
             </div>
-            {data.length > 0 ? (
+            {booksData.books.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm border border-gray-200 bg-white rounded-lg shadow-md">
                   <thead className="bg-gray-100 text-gray-700">
@@ -101,7 +99,7 @@ const BookList = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.map((value, index) => (
+                    {booksData.books.map((value, index) => (
                       <tr
                         key={index}
                         className="border-t hover:bg-gray-50 transition duration-200"
@@ -148,7 +146,6 @@ const BookList = () => {
                             onClick={() => {
                               handleEditClick(value);
                               setBook(value);
-                              // setIsClicked(true);
                             }}
                             className={`${
                               value.quantity === 0
@@ -166,10 +163,10 @@ const BookList = () => {
                 <ReactPaginate
                   previousLabel={
                     <button
-                      disabled={currentPage === 1}
+                      disabled={page === 1}
                       onClick={() => handlePageClick()}
                       className={`px-4 py-2 text-sm font-medium text-white ${
-                        currentPage === 1
+                        page === 1
                           ? "bg-gray-300 cursor-not-allowed"
                           : "bg-gray-600 hover:bg-gray-700"
                       } rounded`}
@@ -179,10 +176,10 @@ const BookList = () => {
                   }
                   nextLabel={
                     <button
-                      disabled={currentPage === totalPages}
+                      disabled={page === booksData?.totalPages}
                       onClick={() => handlePageClick()}
                       className={`px-4 py-2 text-sm font-medium text-white ${
-                        currentPage === totalPages
+                        page === booksData?.totalPages
                           ? "bg-gray-300 cursor-not-allowed"
                           : "bg-gray-600 hover:bg-gray-700"
                       } rounded`}
@@ -195,7 +192,7 @@ const BookList = () => {
                       ...
                     </span>
                   }
-                  pageCount={totalPages} // Total pages calculation
+                  pageCount={booksData?.totalPages || 1} // Total pages calculation
                   marginPagesDisplayed={1}
                   pageRangeDisplayed={1}
                   onPageChange={handlePageClick} // Handle direct page clicks
@@ -205,7 +202,7 @@ const BookList = () => {
                   }
                   activeClassName={"bg-blue-500 text-white border-blue-500"}
                   disabledClassName={"opacity-50 cursor-not-allowed"}
-                  forcePage={currentPage - 1} // Sync with ReactPaginate (0-indexed)
+                  forcePage={page - 1} // Sync with ReactPaginate (0-indexed)
                 />
               </div>
             ) : (
@@ -217,7 +214,6 @@ const BookList = () => {
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white p-6 rounded-lg w-96">
                 <h3 className="text-lg font-semibold mb-4">Edit Book</h3>
-                <>{console.log("first")}</>
                 <Formik
                   initialValues={{
                     newBookName: selectedBook?.name || "",
@@ -272,7 +268,6 @@ const BookList = () => {
                         <p className="text-red-500 text-sm mt-1">
                           {errors.newBookName}
                         </p>
-                        // {/* <ErrorMessage className="text-red-500 text-sm mt-1" name="newBookName"/> */}
                       )}
 
                       <label className="block mb-2 text-sm">Department</label>
@@ -339,9 +334,9 @@ const BookList = () => {
             </div>
           )}
         </div>
-      ) : (
+      {/* ) : (
         <h2 className="text-xl font-bold text-center">Loading...</h2>
-      )}
+      )} */}
     </>
   );
 };

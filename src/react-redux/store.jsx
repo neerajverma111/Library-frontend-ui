@@ -1,16 +1,13 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import bookReducer from "./bookSlice";
-import { usersApi } from "./rtkQuery/usersApi";
-import { setupListeners } from "@reduxjs/toolkit/query";
+import { apiSlice } from "./rtkQuery/usersApi";
 
 export const store = configureStore({
   reducer: {
     book: bookReducer,
-    [usersApi.reducerPath]: usersApi.reducer, // this store is for usersApi rtk query
+    [apiSlice.reducerPath]: apiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(usersApi.middleware),
+    getDefaultMiddleware().concat(apiSlice.middleware),
 });
-
-setupListeners(store.dispatch);

@@ -2,12 +2,11 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../../constants/Constant";
 import { toast } from "react-toastify";
 
-export const usersApi = createApi({
-  reducerPath: "usersApi",
+export const apiSlice = createApi({
+  reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: `http://${apiUrl}`,
     prepareHeaders: (headers) => {
-      // Use the token directly from localStorage to ensure it's always current
       const currentToken = localStorage.getItem("token");
       if (currentToken) {
         headers.set("Authorization", `Bearer ${currentToken}`);
@@ -16,7 +15,9 @@ export const usersApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ["Users", "Books"],
   endpoints: (builder) => ({
+    //Users Endpoints.
     getAllUsers: builder.query({
       query: ({ page = 1, itemsPerPage }) => ({
         url: "users/admin/get-all-users",
@@ -36,8 +37,30 @@ export const usersApi = createApi({
         }
         return response;
       },
+      providesTags: ["Users"],
+    }),
+
+    //Books Endpoints
+    getBooks: builder.query({
+      query: ({ page = 1, itemsPerPage }) => ({
+        url: "books",
+        params: { page, limit: itemsPerPage },
+        method: "GET",
+      }),
+      transformResponse: (response) => {
+        if (response?.status === 200) {
+          return {
+            books: response.data.books,
+            totalPages: response.data.totalPages,
+            totalBooks: response.data.totalBooks,
+            currentPage: response.data.currentPage,
+          };
+        }
+        return response;
+      },
+      providesTags: ["Books"],
     }),
   }),
 });
 
-export const { useGetAllUsersQuery } = usersApi;
+export const { useGetAllUsersQuery, useGetBooksQuery } = apiSlice;
