@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { useGetAllUsersQuery } from "../react-redux/rtkQuery/usersApi";
-import { apiUrl, jwtToken } from "../constants/Constant";
+import { BASE_URL, jwtToken, UPDATE_USERS_STATUS_URL } from "../constants/Constant";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const WhitelistUsers = () => {
@@ -15,15 +15,13 @@ const WhitelistUsers = () => {
   const updateUser = async (userId, isChecked) => {
     try {
       const response = await axios.put(
-        `http://${apiUrl}/users/admin/whitelist`,
+        `${BASE_URL}${UPDATE_USERS_STATUS_URL}`,
         { UserId: userId, isWhitelisted: isChecked },
         jwtToken
       );
       if (response.status) {
         toast.success(response.data.message);
         refetch();
-        // getAllUsers();
-        // data;
       } else {
         navigate("/");
       }

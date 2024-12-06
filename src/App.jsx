@@ -14,53 +14,51 @@ import UserBook from "./UserPanel/UserBook.jsx";
 import ReturnBook from "./UserPanel/ReturnBook.jsx";
 import AllThingsHere from "./components/AllThingsHere.jsx";
 import Payfine from "./UserPanel/Payfine.jsx";
-import { AdminProtectedRoute } from "./constants/AdminProtectedRoute.jsx";
 import { ProtectedRoute } from "./constants/ProtectedRoute.jsx";
+import {
+  ADD_BOOK,
+  ADMIN,
+  ADMIN_DASHBOARD,
+  BOOK_LIST,
+  ISSUE_BOOK,
+  NOT_AUTHORIZED,
+  PAY_FINE,
+  RETURN_BOOK,
+  SIGN_UP,
+  USER_DASHBOARD,
+  USER_LIST,
+} from "./constants/Constant.jsx";
 
 function App() {
-  // const onRender = (
-  //   id, // The "id" prop of the Profiler tree that has just committed
-  //   phase, // Either "mount" (initial render) or "update" (re-render)
-  //   actualDuration, // Time spent rendering the committed update
-  //   baseDuration, // Estimated time to render the entire subtree without memoization
-  //   startTime, // When React started rendering this update
-  //   commitTime, // When React committed this update
-  //   interactions // The interactions that were part of this update
-  // ) => {
-  //   console.log("Profiler Log:", { id, phase, actualDuration });
-  // };
-
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LoginUser />} />
-          <Route path="/Signup" element={<Signup />} />
-          <Route path="/not-authorized" element={<Auth />} />
-          <Route path="/admin" element={<Admin />} />
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginUser />} />
+        <Route path={`${SIGN_UP}`} element={<Signup />} />
+        <Route path={`${NOT_AUTHORIZED}`} element={<Auth />} />
+        <Route path={`${ADMIN}`} element={<Admin />} />
 
-          <Route element={<MainDashboard />}>
-            {/* <Route element={<AdminProtectedRoute />}> */}
-            <Route path="/book-list" element={<BookList />} />
-            <Route path="/add-book" element={<AddBook />} />
-            <Route path="/user-list" element={<WhitelistUsers />} />
-            <Route path="/admin-dashboard" element={<AllThingsHere />} />
-            {/* </Route> */}
+        <Route element={<MainDashboard />}>
+          {/* <Route element={<AdminProtectedRoute />}> */}
+          <Route path={`${BOOK_LIST}`} element={<BookList />} />
+          <Route path={`${ADD_BOOK}`} element={<AddBook />} />
+          <Route path={`${USER_LIST}`} element={<WhitelistUsers />} />
+          <Route path={`${ADMIN_DASHBOARD}`} element={<AllThingsHere />} />
+          {/* </Route> */}
+        </Route>
+
+        <Route element={<ProtectedRoute />}>
+          <Route element={<User />}>
+            <Route path={`${USER_DASHBOARD}`} element={<UserBook />} />
+            <Route path={`${ISSUE_BOOK}`} element={<IssueBook />} />
+            <Route path={`${RETURN_BOOK}`} element={<ReturnBook />} />
+            <Route path={`${PAY_FINE}`} element={<Payfine />} />
           </Route>
+        </Route>
 
-          <Route element={<ProtectedRoute />}>
-            <Route element={<User />}>
-              <Route path="/user-dashboard" element={<UserBook />} />
-              <Route path="/issueBook" element={<IssueBook />} />
-              <Route path="/return-book" element={<ReturnBook />} />
-              <Route path="/pay-fine" element={<Payfine />} />
-            </Route>
-          </Route>
-
-          <Route path="/add-book" element={<AddBook />} />
-        </Routes>
-      </Router>
-    </>
+        <Route path={`${ADD_BOOK}`} element={<AddBook />} />
+      </Routes>
+    </Router>
   );
 }
 

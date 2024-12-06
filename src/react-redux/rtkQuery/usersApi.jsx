@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { apiUrl } from "../../constants/Constant";
+import { BASE_URL, GET_ALL_USERS_URL, GET_BOOKS_URL } from "../../constants/Constant";
 import { toast } from "react-toastify";
 
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: `http://${apiUrl}`,
+    baseUrl: BASE_URL,
     prepareHeaders: (headers) => {
       const currentToken = localStorage.getItem("token");
       if (currentToken) {
@@ -20,7 +20,7 @@ export const apiSlice = createApi({
     //Users Endpoints.
     getAllUsers: builder.query({
       query: ({ page = 1, itemsPerPage }) => ({
-        url: "users/admin/get-all-users",
+        url: GET_ALL_USERS_URL,
         params: { page, limit: itemsPerPage },
         method: "GET",
       }),
@@ -43,7 +43,7 @@ export const apiSlice = createApi({
     //Books Endpoints
     getBooks: builder.query({
       query: ({ page = 1, itemsPerPage }) => ({
-        url: "books",
+        url: GET_BOOKS_URL,
         params: { page, limit: itemsPerPage },
         method: "GET",
       }),
